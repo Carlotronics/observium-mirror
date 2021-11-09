@@ -70,13 +70,12 @@
 // VIPTELA-HARDWARE::hardwareTemperatureThresholdsRedAlarmBadFan.cPU-Junction.0 = Gauge32: 90
 // VIPTELA-HARDWARE::hardwareTemperatureThresholdsRedAlarmBadFan.dRAM.0 = Gauge32: 75
 
-$oids = snmpwalk_cache_multi_oid($device, "hardwareEnvironmentTable", [], "VIPTELA-HARDWARE");
-$oids_limits = snmpwalk_cache_multi_oid($device, "hardwareTemperatureThresholdsTable", [], "VIPTELA-HARDWARE");
+$oids = snmpwalk_cache_oid($device, "hardwareEnvironmentTable", [], "VIPTELA-HARDWARE");
+$oids_limits = snmpwalk_cache_oid($device, "hardwareTemperatureThresholdsTable", [], "VIPTELA-HARDWARE");
 print_debug_vars($oids);
 print_debug_vars($oids_limits);
 
-foreach ($oids as $named_index => $entry)
-{
+foreach ($oids as $named_index => $entry) {
   list($hw_class, $hw_item, $hw_index) = explode('.', $named_index, 3);
 
   // Convert to numeric index
@@ -88,8 +87,7 @@ foreach ($oids as $named_index => $entry)
       $index = '0' . $index;
 
       $descr    = $hw_item;
-      if ($descr == 'Board')
-      {
+      if ($descr === 'Board') {
         $descr .= ' ' . $hw_index;
       }
       $oid_name = 'hardwareEnvironmentMeasurement';
@@ -100,12 +98,10 @@ foreach ($oids as $named_index => $entry)
       // Detect limits
       $hw_index = strtolower(str_replace(' ', '-', $hw_item)) . '.' . $hw_index;
       $limits = [];
-      foreach ($oids_limits as $limit_index => $limit_entry)
-      {
+      foreach ($oids_limits as $limit_index => $limit_entry) {
         $limit_index = strtolower($limit_index);
 
-        if ($hw_index == $limit_index)
-        {
+        if ($hw_index == $limit_index) {
           $limits['limit_high']      = $limit_entry['hardwareTemperatureThresholdsRedAlarmNormal'];
           $limits['limit_high_warn'] = $limit_entry['hardwareTemperatureThresholdsYellowAlarmNormal'];
           break;

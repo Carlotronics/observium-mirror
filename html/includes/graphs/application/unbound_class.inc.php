@@ -28,10 +28,10 @@ $colours = $config['graph_colours']['mixed']; # needs moar colours!
 
 foreach ($dns_class as $class)
 {
-  $array["class$class"] = array('descr' => strtoupper($class), 'colour' => $colours[(count($array) % count($colours))]);
+  $array["class$class"] = array('descr' => strtoupper($class), 'colour' => $colours[(safe_count($array) % safe_count($colours))]);
 }
 
-if (is_file($rrd_filename))
+if (rrd_is_file($rrd_filename))
 {
   foreach ($array as $ds => $data)
   {

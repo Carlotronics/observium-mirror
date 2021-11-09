@@ -25,7 +25,7 @@ foreach ($vars['id'] as $ifid)
 {
   $int = dbFetchRow("SELECT `ifIndex`, `hostname`, D.`device_id` FROM `ports` AS I, devices AS D WHERE I.port_id = ? AND I.device_id = D.device_id", array($ifid));
   $rrdfile = get_port_rrdfilename($int, NULL, TRUE);
-  if (is_file($rrdfile))
+  if (rrd_is_file($rrdfile))
   {
     $rrd_options .= " DEF:inoctets" . $i . "=" . $rrdfile . ":INOCTETS:AVERAGE";
     $rrd_options .= " DEF:outoctets" . $i . "=" . $rrdfile . ":OUTOCTETS:AVERAGE";
@@ -42,7 +42,7 @@ foreach ($vars['idb'] as $ifid)
 {
   $int = dbFetchRow("SELECT `ifIndex`, `hostname`, D.`device_id` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id", array($ifid));
   $rrdfile = get_port_rrdfilename($int, NULL, TRUE);
-  if (is_file($rrdfile))
+  if (rrd_is_file($rrdfile))
   {
     $rrd_options .= " DEF:inoctetsb" . $i . "=" . $rrdfile . ":INOCTETS:AVERAGE";
     $rrd_options .= " DEF:outoctetsb" . $i . "=" . $rrdfile . ":OUTOCTETS:AVERAGE";
@@ -57,10 +57,10 @@ foreach ($vars['idb'] as $ifid)
 if ($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
 $in_thing   = implode(',', $rrd_multi['in_thing']);
 $out_thing  = implode(',', $rrd_multi['out_thing']);
-$pluses     = str_repeat(',ADDNAN', count($rrd_multi['in_thing']) - 1);
+$pluses     = str_repeat(',ADDNAN', safe_count($rrd_multi['in_thing']) - 1);
 $in_thingb  = implode(',', $rrd_multi['in_thingb']);
 $out_thingb = implode(',', $rrd_multi['out_thingb']);
-$plusesb    = str_repeat(',ADDNAN', count($rrd_multi['in_thingb']) - 1);
+$plusesb    = str_repeat(',ADDNAN', safe_count($rrd_multi['in_thingb']) - 1);
 $rrd_options .= " CDEF:".$in."octets=" . $in_thing . $pluses;
 $rrd_options .= " CDEF:".$out."octets=" . $out_thing . $pluses;
 $rrd_options .= " CDEF:".$in."octetsb=" . $in_thingb . $plusesb;

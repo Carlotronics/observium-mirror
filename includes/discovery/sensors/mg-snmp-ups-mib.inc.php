@@ -6,18 +6,18 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2020 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2021 Observium Limited
  *
  */
 
 $cache['mge'] = array();
-$cache['mge'] = snmpwalk_cache_multi_oid($device, "upsmgInputPhaseTable", $cache['mge'], "MG-SNMP-UPS-MIB");
+$cache['mge'] = snmpwalk_cache_oid($device, "upsmgInputPhaseTable", $cache['mge'], "MG-SNMP-UPS-MIB");
 
 // Input
 $numPhase = snmp_get_oid($device, "upsmgInputPhaseNum.0", "MG-SNMP-UPS-MIB");
 
 // Great job MGE - my devices don't have mginputPhaseIndex, and mginputMinimumVoltage and mginputMaximumVoltage. are using different indexes.
-if (count(array_keys($cache['mge'])) > $numPhase) { unset($cache['mge'][0]); } // Remove [0] key with above 2 fields, leaving 1.0 etc for actual phases.
+if (safe_count(array_keys($cache['mge'])) > $numPhase) { unset($cache['mge'][0]); } // Remove [0] key with above 2 fields, leaving 1.0 etc for actual phases.
 $scale = 0.1;
 foreach ($cache['mge'] as $index => $entry)
 {
@@ -60,7 +60,7 @@ foreach ($cache['mge'] as $index => $entry)
 
 // Output
 $cache['mge'] = array();
-$cache['mge'] = snmpwalk_cache_multi_oid($device, "upsmgOutput", $cache['mge'], "MG-SNMP-UPS-MIB");
+$cache['mge'] = snmpwalk_cache_oid($device, "upsmgOutput", $cache['mge'], "MG-SNMP-UPS-MIB");
 
 // WHAT the f..k, why this wrong $index copy-pasted
 $index_rename = $index; // Get old broken index for rename rrds
@@ -203,7 +203,7 @@ if (isset($entry['upsmgOutputOverTemp']))
 
 $scale = 0.1;
 $cache['mge'] = array();
-$cache['mge'] = snmpwalk_cache_multi_oid($device, "upsmgOutputPhaseTable", $cache['mge'], "MG-SNMP-UPS-MIB");
+$cache['mge'] = snmpwalk_cache_oid($device, "upsmgOutputPhaseTable", $cache['mge'], "MG-SNMP-UPS-MIB");
 
 $upsmgOutputPhaseNum = snmp_get_oid($device, "upsmgOutputPhaseNum.0", "MG-SNMP-UPS-MIB");
 
@@ -246,7 +246,7 @@ $cache['mge'] = array();
 foreach (array("upsmgBattery") as $table)
 {
   echo("$table ");
-  $cache['mge'] = snmpwalk_cache_multi_oid($device, $table, $cache['mge'], "MG-SNMP-UPS-MIB", NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
+  $cache['mge'] = snmpwalk_cache_oid($device, $table, $cache['mge'], "MG-SNMP-UPS-MIB", NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
 }
 
 foreach ($cache['mge'] as $index => $entry)
@@ -362,7 +362,7 @@ $cache['mge'] = array();
 foreach (array("upsmgEnviron") as $table)
 {
   //echo("$table ");
-  $cache['mge'] = snmpwalk_cache_multi_oid($device, $table, $cache['mge'], "MG-SNMP-UPS-MIB", NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
+  $cache['mge'] = snmpwalk_cache_oid($device, $table, $cache['mge'], "MG-SNMP-UPS-MIB", NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
 }
 
 // MG-SNMP-UPS-MIB::upsmgEnvironAmbientTemp.0 = INTEGER: 0
@@ -395,7 +395,7 @@ $cache['mge'] = array();
 foreach (array("upsmgConfigEnvironmentTable","upsmgEnvironmentSensorTable") as $table)
 {
   echo("$table ");
-  $cache['mge'] = snmpwalk_cache_multi_oid($device, $table, $cache['mge'], "MG-SNMP-UPS-MIB", NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
+  $cache['mge'] = snmpwalk_cache_oid($device, $table, $cache['mge'], "MG-SNMP-UPS-MIB", NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
 }
 
 // upsmgConfigSensorIndex.1 = 1

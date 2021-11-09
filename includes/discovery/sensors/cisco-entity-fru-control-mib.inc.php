@@ -6,7 +6,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2020 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2021 Observium Limited
  *
  */
 
@@ -18,10 +18,10 @@ $entity_array = array();
 $oids = array('cefcFRUPowerStatusEntry', 'cefcFanTrayStatusEntry', 'cefcFanEntry', 'cefcModuleEntry');
 foreach ($oids as $oid)
 {
-  $entity_array = snmpwalk_cache_multi_oid($device, $oid, $entity_array, 'CISCO-ENTITY-FRU-CONTROL-MIB');
+  $entity_array = snmpwalk_cache_oid($device, $oid, $entity_array, 'CISCO-ENTITY-FRU-CONTROL-MIB');
 }
 // split PowerSupplyGroup from common walk array
-$cefcFRUPowerSupplyGroupEntry = snmpwalk_cache_multi_oid($device, 'cefcFRUPowerSupplyGroupEntry', array(), 'CISCO-ENTITY-FRU-CONTROL-MIB');
+$cefcFRUPowerSupplyGroupEntry = snmpwalk_cache_oid($device, 'cefcFRUPowerSupplyGroupEntry', array(), 'CISCO-ENTITY-FRU-CONTROL-MIB');
 
 if (count($entity_array))
 {
@@ -35,14 +35,14 @@ if (count($entity_array))
     $oids       = array('entPhysicalDescr', 'entPhysicalName', 'entPhysicalClass', 'entPhysicalContainedIn', 'entPhysicalParentRelPos');
     foreach ($oids as $oid)
     {
-      $entity_mib = snmpwalk_cache_multi_oid($device, $oid, $entity_mib, 'ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB');
+      $entity_mib = snmpwalk_cache_oid($device, $oid, $entity_mib, 'ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB');
       if (!$GLOBALS['snmp_status']) { break; }
     }
     //$entity_mib = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_mib, 'ENTITY-MIB:IF-MIB');
   }
 
   // Merge with ENTITY-MIB
-  if (count($entity_mib))
+  if (safe_count($entity_mib))
   {
     // Power & Fan
     foreach ($entity_array as $index => $entry)

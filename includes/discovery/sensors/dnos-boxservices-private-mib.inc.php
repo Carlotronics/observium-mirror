@@ -1,13 +1,12 @@
 <?php
-
 /**
  * Observium
  *
  *   This file is part of Observium.
  *
- * @package        observium
- * @subpackage     discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
+ * @package    observium
+ * @subpackage discovery
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2021 Observium Limited
  *
  */
 
@@ -31,12 +30,11 @@
 // DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorTemperature.2.1 = INTEGER: 28
 
 $oid = 'boxServicesTempSensorsTable';
-$oids = snmpwalk_cache_multi_oid($device, $oid, array(), $mib);
+$oids = snmpwalk_cache_oid($device, $oid, array(), $mib);
 
 // By first detect if device used old FAST-BOXSERVICES-PRIVATE-MIB, it use single key in boxServicesTempSensorsTable
 $index = explode('.', key($oids));
-if (count($oids) && count($index) === 1)
-{
+if (safe_count($oids) && count($index) === 1) {
   print_debug('Device must use OLD-DNOS-BOXSERVICES-PRIVATE-MIB');
 
   return; // Exit from mib discovery
@@ -87,7 +85,7 @@ foreach ($oids as $index => $entry)
 // boxServicesTempUnitState.3 = normal
 
 $oid = 'boxServicesTempUnitState';
-$oids = snmpwalk_cache_multi_oid($device, $oid, array(), $mib);
+$oids = snmpwalk_cache_oid($device, $oid, array(), $mib);
 
 foreach ($oids as $index => $entry)
 {
@@ -116,8 +114,8 @@ foreach ($oids as $index => $entry)
 // DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFanDutyLevel.1 = INTEGER: 0
 
 $oid = 'boxServicesFansTable';
-$oids = snmpwalk_cache_multi_oid($device, $oid, array(), $mib);
-$show_numbers = count($oids) > 1;
+$oids = snmpwalk_cache_oid($device, $oid, array(), $mib);
+$show_numbers = safe_count($oids) > 1;
 
 foreach ($oids as $index => $entry)
 {
@@ -185,12 +183,13 @@ foreach ($oids as $index => $entry)
 // DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyItemState.1 = INTEGER: notpresent(1)
 
 $oid = 'boxServicesPowSuppliesTable';
-$oids = snmpwalk_cache_multi_oid($device, $oid, array(), $mib);
-$show_numbers = count($oids) > 1;
+$oids = snmpwalk_cache_oid($device, $oid, array(), $mib);
+$show_numbers = safe_count($oids) > 1;
 
 foreach ($oids as $index => $entry)
 {
-  if ($entry['boxServicesPowSupplyItemState'] == 'notpresent')
+  if ($entry['boxServicesPowSupplyItemState'] === 'notpresent' ||
+      ($entry['boxServicesPowSupplyItemType'] == 0 && $entry['boxServicesPowSupplyItemState'] === 'failed')) // This sensor not really exist)
   {
     continue;
   }
@@ -206,11 +205,10 @@ foreach ($oids as $index => $entry)
   list($unit, $iter) = explode('.', $index);
   $descr = "Unit $unit PSU " . ($iter + 1) . ' (' . nicecase(rewrite_entity_name($entry['boxServicesPowSupplyItemType'])) . ')';
 
-  $sensor_oid = ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.7.1.3.$index";
+  $status_oid = ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.7.1.3.$index";
   $options = array('entPhysicalClass' => 'power');
 
-  discover_status($device, $sensor_oid, "boxServicesPowSupplyItemState.$index", 'dnos-boxservices-state', $descr,
-                  $value, $options);
+  //discover_status($device, $sensor_oid, "boxServicesPowSupplyItemState.$index", 'dnos-boxservices-state', $descr, $value, $options);
   discover_status_ng($device, $mib, 'boxServicesPowSupplyItemState', $status_oid, $index, 'dnos-boxservices-state', $descr, $value, $options);
 
 }
@@ -248,7 +246,7 @@ foreach ($oids as $index => $entry)
 //$oid  = 'boxsUnitPwrUsageHistoryTable';
 $oid = 'boxsPwrUsageHistoryUnitPowerConsumption';
 
-$oids = snmpwalk_cache_multi_oid($device, $oid, array(), $mib);
+$oids = snmpwalk_cache_oid($device, $oid, array(), $mib);
 
 // This may not hold up in the long run, but...
 // Assume:

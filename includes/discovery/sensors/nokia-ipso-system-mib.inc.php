@@ -22,8 +22,8 @@ if ($value !== '')
 }
 
 // NOKIA-IPSO-SYSTEM-MIB::ipsoFanOperStatus.1 = INTEGER: running(1)
-$data = snmpwalk_cache_multi_oid($device, 'ipsoFanTable', array(), 'NOKIA-IPSO-SYSTEM-MIB');
-$data_multi = count($data) > 1; // Set TRUE if more than one index
+$data = snmpwalk_cache_oid($device, 'ipsoFanTable', array(), 'NOKIA-IPSO-SYSTEM-MIB');
+$data_multi = safe_count($data) > 1; // Set TRUE if more than one index
 foreach ($data as $index => $entry)
 {
   $oid   = '.1.3.6.1.4.1.94.1.21.1.2.1.1.2.' . $index;
@@ -36,8 +36,8 @@ foreach ($data as $index => $entry)
 
 // NOKIA-IPSO-SYSTEM-MIB::ipsoPowerSupplyOverTemperature.1 = INTEGER: normal(1)
 // NOKIA-IPSO-SYSTEM-MIB::ipsoPowerSupplyOperStatus.1 = INTEGER: running(1)
-$data = snmpwalk_cache_multi_oid($device, 'ipsoPowerSupplyTable', array(), 'NOKIA-IPSO-SYSTEM-MIB');
-$data_multi = count($data) > 1; // Set TRUE if more than one index
+$data = snmpwalk_cache_oid($device, 'ipsoPowerSupplyTable', array(), 'NOKIA-IPSO-SYSTEM-MIB');
+$data_multi = safe_count($data) > 1; // Set TRUE if more than one index
 foreach ($data as $index => $entry)
 {
   $oid   = '.1.3.6.1.4.1.94.1.21.1.3.1.1.2.' . $index;
